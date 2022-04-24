@@ -86,19 +86,19 @@ finger=[]
 thumb = 1
 old_thumb = 1
 
-thumb_motor = Motor('A')
-index_motor = Motor('B')
-middle_motor = Motor('C') #--> caution: middle move together with ring
-pinky_motor = Motor('D') 
+thumb_motor = Motor('D')
+index_motor = Motor('C')
+middle_motor = Motor('B') #--> caution: middle move together with ring
+pinky_motor = Motor('A') 
 
 ##################################################
 ################      ACTIONS     ################ 
 ##################################################
 
-random_choice = random.randint(0,2)
+random_choice = 0 #random.randint(0,2)
 status = hand_status(random_choice,pinky_motor,middle_motor,index_motor,thumb_motor)
       
-# #Create an infinite loop which will produce the live feed to our desktop and that will search for hands
+#Create an infinite loop which will produce the live feed to our desktop and that will search for hands
 # while True:
      
 #     ret, frame = cap.read() 
