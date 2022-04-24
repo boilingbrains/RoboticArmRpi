@@ -14,7 +14,7 @@ import mediapipe as freedomtech
 ##################################################
 
 def hand_status(random_choice,pinky_motor,middle_motor,index_motor,thumb_motor):
-    status="" 
+    status = "" 
     #rock
     if random_choice == 0:
         pinky_motor.run_to_position(90)
@@ -69,22 +69,22 @@ def findnameoflandmark(frame1):
 ################  INITIALIZATION  ################
 ##################################################
 
-drawingModule = freedomtech.solutions.drawing_utils
-handsModule = freedomtech.solutions.hands
+# drawingModule = freedomtech.solutions.drawing_utils
+# handsModule = freedomtech.solutions.hands
 
-mod=handsModule.Hands()
+# mod = handsModule.Hands()
 
-h=480
-w=640 
+# h=480
+# w=640 
 
-cap = cv2.VideoCapture(0)
-tip=[8,12,16,20,4]
-tipname=[8,12,16,20,4]
-fingers=[]
-old_fingers = []
-finger=[]
-thumb = 1
-old_thumb = 1
+# cap = cv2.VideoCapture(0)
+# tip=[8,12,16,20,4]
+# tipname=[8,12,16,20,4]
+# fingers=[]
+# old_fingers = []
+# finger=[]
+# thumb = 1
+# old_thumb = 1
 
 thumb_motor = Motor('D')
 index_motor = Motor('C')
