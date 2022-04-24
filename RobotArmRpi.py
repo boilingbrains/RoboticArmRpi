@@ -2,11 +2,11 @@
 ###################  MODULES  ####################
 ##################################################
 
-import cv2
+#import cv2
 import math
 import random
 from buildhat import Motor
-import mediapipe as freedomtech
+#import mediapipe as freedomtech
 
 
 ##################################################
@@ -38,30 +38,30 @@ def hand_status(random_choice,pinky_motor,middle_motor,index_motor,thumb_motor):
         status = "sissor"
     return status
 
-def findpostion(frame1):
-    list=[]
-    results = mod.process(cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB))
-    if results.multi_hand_landmarks != None:
-       for handLandmarks in results.multi_hand_landmarks:
-           drawingModule.draw_landmarks(frame1, handLandmarks, handsModule.HAND_CONNECTIONS)
-           list=[]
-           for id, pt in enumerate (handLandmarks.landmark):
-                x = int(pt.x * w)
-                y = int(pt.y * h)
-                list.append([id,x,y])
+# def findpostion(frame1):
+#     list=[]
+#     results = mod.process(cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB))
+#     if results.multi_hand_landmarks != None:
+#        for handLandmarks in results.multi_hand_landmarks:
+#            drawingModule.draw_landmarks(frame1, handLandmarks, handsModule.HAND_CONNECTIONS)
+#            list=[]
+#            for id, pt in enumerate (handLandmarks.landmark):
+#                 x = int(pt.x * w)
+#                 y = int(pt.y * h)
+#                 list.append([id,x,y])
 
-    return list            
+#     return list            
 
-def findnameoflandmark(frame1):
-     list=[]
-     results = mod.process(cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB))
-     if results.multi_hand_landmarks != None:
-        for handLandmarks in results.multi_hand_landmarks:
+# def findnameoflandmark(frame1):
+#      list=[]
+#      results = mod.process(cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB))
+#      if results.multi_hand_landmarks != None:
+#         for handLandmarks in results.multi_hand_landmarks:
 
 
-            for point in handsModule.HandLandmark:
-                 list.append(str(point).replace ("< ","").replace("HandLandmark.", "").replace("_"," ").replace("[]",""))
-     return list
+#             for point in handsModule.HandLandmark:
+#                  list.append(str(point).replace ("< ","").replace("HandLandmark.", "").replace("_"," ").replace("[]",""))
+#      return list
     
     
     
@@ -97,7 +97,7 @@ pinky_motor = Motor('A')
 
 random_choice = 0 #random.randint(0,2)
 status = hand_status(random_choice,pinky_motor,middle_motor,index_motor,thumb_motor)
-      
+print      
 #Create an infinite loop which will produce the live feed to our desktop and that will search for hands
 # while True:
      
