@@ -37,7 +37,12 @@ def hand_status(random_choice,pinky_motor,middle_motor,index_motor,thumb_motor):
         thumb_motor.run_to_position(0)
         status = "sissor"
     return status
-
+def reset(pinky_motor,middle_motor,index_motor,thumb_motor):
+    pinky_motor.run_to_position(0)
+    index_motor.run_to_position(0)
+    middle_motor.run_to_position(0)
+    thumb_motor.run_to_position(0)
+    print("Reset")
 # def findpostion(frame1):
 #     list=[]
 #     results = mod.process(cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB))
@@ -97,7 +102,8 @@ pinky_motor = Motor('A')
 
 random_choice = 0 #random.randint(0,2)
 status = hand_status(random_choice,pinky_motor,middle_motor,index_motor,thumb_motor)
-print      
+print(status)
+reset(pinky_motor,middle_motor,index_motor,thumb_motor)      
 #Create an infinite loop which will produce the live feed to our desktop and that will search for hands
 # while True:
      
