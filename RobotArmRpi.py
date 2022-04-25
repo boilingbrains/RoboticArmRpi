@@ -17,10 +17,10 @@ def hand_status(random_choice,pinky_motor,middle_motor,index_motor,thumb_motor):
     status = "" 
     #rock
     if random_choice == 0:
+        thumb_motor.run_to_position(170)
         pinky_motor.run_to_position(90)
         index_motor.run_to_position(-80)
         middle_motor.run_to_position(90)
-        thumb_motor.run_to_position(90)
         status = "rock"
     #paper
     elif random_choice == 1:
