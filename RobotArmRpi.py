@@ -119,7 +119,6 @@ with mp_hands.Hands(
         random_choice = random.randint(0,2)
         #robot =  "paper"
         robot = hand_status(random_choice,pinky_motor,middle_motor,index_motor,thumb_motor)
-        reset(pinky_motor,middle_motor,index_motor,thumb_motor)
         hls = results.multi_hand_landmarks
         if hls and len(hls) == 1 :
             humain = getHandMove(hls[0])
@@ -143,9 +142,11 @@ with mp_hands.Hands(
             else:
                 text = f"{text}:  Robot wins"
                 text2 = "Fuck !"
+            reset(pinky_motor,middle_motor,index_motor,thumb_motor)
         else:
             text = "No player or didn't play properly"
             text2 = "Restart !"
+            reset(pinky_motor,middle_motor,index_motor,thumb_motor)
     cv2.putText(image,f"{text2}", (10,30),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),1,cv2.LINE_AA)
     cv2.putText(image,text, (150,60),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),2,cv2.LINE_AA)
     clock = (clock + 1) % 150
