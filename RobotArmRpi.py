@@ -6,7 +6,7 @@ import cv2
 import math
 import time
 import random
-#from buildhat import Motor
+from buildhat import Motor
 import mediapipe as mp
 
 
@@ -61,10 +61,10 @@ def getHandMove(hand_landmarks):
 ##################################################
 ################  INITIALIZATION  ################
 ##################################################
-# thumb_motor = Motor('D')
-# index_motor = Motor('C')
-# middle_motor = Motor('B') #--> caution: middle move together with ring
-# pinky_motor = Motor('A') 
+thumb_motor = Motor('D')
+index_motor = Motor('C')
+middle_motor = Motor('B') #--> caution: middle move together with ring
+pinky_motor = Motor('A') 
 clock = 0
 text = ""
 humain = None
@@ -116,10 +116,10 @@ with mp_hands.Hands(
         text2 = "1..."
     elif clock == 90:
         text2 = "GO !"
-        #random_choice = random.randint(0,2)
-        robot =  "paper"
-        #status = hand_status(random_choice,pinky_motor,middle_motor,index_motor,thumb_motor)
-        #reset(pinky_motor,middle_motor,index_motor,thumb_motor)
+        random_choice = random.randint(0,2)
+        #robot =  "paper"
+        robot = hand_status(random_choice,pinky_motor,middle_motor,index_motor,thumb_motor)
+        reset(pinky_motor,middle_motor,index_motor,thumb_motor)
         hls = results.multi_hand_landmarks
         if hls and len(hls) == 1 :
             humain = getHandMove(hls[0])
