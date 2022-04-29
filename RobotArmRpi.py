@@ -2,11 +2,12 @@
 ###################  MODULES  ####################
 ##################################################
 
-#import cv2
+import cv2
 import math
+import time
 import random
-from buildhat import Motor
-#import mediapipe as freedomtech
+#from buildhat import Motor
+import mediapipe as mp
 
 
 ##################################################
@@ -14,119 +15,144 @@ from buildhat import Motor
 ##################################################
 
 def hand_status(random_choice,pinky_motor,middle_motor,index_motor,thumb_motor):
-    status = "" 
     #rock
     if random_choice == 0:
         thumb_motor.run_to_position(170)
         pinky_motor.run_to_position(90)
         index_motor.run_to_position(-80)
         middle_motor.run_to_position(90)
-        status = "rock"
+        return "rock"
     #paper
     elif random_choice == 1:
         pinky_motor.run_to_position(0)
         index_motor.run_to_position(0)
         middle_motor.run_to_position(0)
         thumb_motor.run_to_position(0)
-        status = "paper"
+        return "paper"
     #sissor
     elif random_choice == 2:
         pinky_motor.run_to_position(90)
         index_motor.run_to_position(0)
         middle_motor.run_to_position(80)
         thumb_motor.run_to_position(0)
-        status = "sissor"
-    return status
+        return "scissors"
 def reset(pinky_motor,middle_motor,index_motor,thumb_motor):
     pinky_motor.run_to_position(0)
     index_motor.run_to_position(0)
     middle_motor.run_to_position(0)
     thumb_motor.run_to_position(0)
     print("Reset")
-# def findpostion(frame1):
-#     list=[]
-#     results = mod.process(cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB))
-#     if results.multi_hand_landmarks != None:
-#        for handLandmarks in results.multi_hand_landmarks:
-#            drawingModule.draw_landmarks(frame1, handLandmarks, handsModule.HAND_CONNECTIONS)
-#            list=[]
-#            for id, pt in enumerate (handLandmarks.landmark):
-#                 x = int(pt.x * w)
-#                 y = int(pt.y * h)
-#                 list.append([id,x,y])
+def getHandMove(hand_landmarks):
+    landmarks = hand_landmarks.landmark 
+    # print(type(landmarks[13].y))
+    # print(type(landmarks[16].y))
+    # print(type(landmarks[17].y))
+    # print(type(landmarks[20].y))
+    if all([landmarks[i].y < landmarks[i+3].y for i in range(9,20,4)]):
+        return "rock" 
+    elif landmarks[13].y < landmarks[16].y and landmarks[17].y < landmarks[20]:
+        return "scissors"
+    else:
+        return "paper"
 
-#     return list            
-
-# def findnameoflandmark(frame1):
-#      list=[]
-#      results = mod.process(cv2.cvtColor(frame1, cv2.COLOR_BGR2RGB))
-#      if results.multi_hand_landmarks != None:
-#         for handLandmarks in results.multi_hand_landmarks:
-
-
-#             for point in handsModule.HandLandmark:
-#                  list.append(str(point).replace ("< ","").replace("HandLandmark.", "").replace("_"," ").replace("[]",""))
-#      return list
     
     
     
 ##################################################
 ################  INITIALIZATION  ################
 ##################################################
+# thumb_motor = Motor('D')
+# index_motor = Motor('C')
+# middle_motor = Motor('B') #--> caution: middle move together with ring
+# pinky_motor = Motor('A') 
+clock = 0
+text = ""
+humain = None
+robot = None
+succes = True
+mp_drawing = mp.solutions.drawing_utils
+mp_drawing_styles = mp.solutions.drawing_styles
+mp_hands = mp.solutions.hands
 
-# drawingModule = freedomtech.solutions.drawing_utils
-# handsModule = freedomtech.solutions.hands
+cap = cv2.VideoCapture(0)
+with mp_hands.Hands(
+    model_complexity=0,
+    min_detection_confidence=0.5,
+    min_tracking_confidence=0.5) as hands:
+  while cap.isOpened():
+    ret, image = cap.read()
+    if not ret:
+      print("Ignoring empty camera frame.")
+      # If loading a video, use 'break' instead of 'continue'.
+      continue   
 
-# mod = handsModule.Hands()
+    image.flags.writeable = False
+    image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+    results = hands.process(image)
 
-# h=480
-# w=640 
-
-# cap = cv2.VideoCapture(0)
-# tip=[8,12,16,20,4]
-# tipname=[8,12,16,20,4]
-# fingers=[]
-# old_fingers = []
-# finger=[]
-# thumb = 1
-# old_thumb = 1
-
-thumb_motor = Motor('D')
-index_motor = Motor('C')
-middle_motor = Motor('B') #--> caution: middle move together with ring
-pinky_motor = Motor('A') 
-
-##################################################
-################      ACTIONS     ################ 
-##################################################
-
-random_choice = 0 #random.randint(0,2)
-status = hand_status(random_choice,pinky_motor,middle_motor,index_motor,thumb_motor)
-print(status)
-reset(pinky_motor,middle_motor,index_motor,thumb_motor)      
-#Create an infinite loop which will produce the live feed to our desktop and that will search for hands
-# while True:
-     
-#     ret, frame = cap.read() 
+    # Draw the hand annotations on the image.
+    image.flags.writeable = True
+    image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
+    if results.multi_hand_landmarks:
+        for hand_landmarks in results.multi_hand_landmarks:
+            mp_drawing.draw_landmarks(
+                image,
+                hand_landmarks,
+                mp_hands.HAND_CONNECTIONS,
+                mp_drawing_styles.get_default_hand_landmarks_style(),
+                mp_drawing_styles.get_default_hand_connections_style())
     
-#     #Unedit the below line if your live feed is produced upsidedown
-#     #flipped = cv2.flip(frame, flipCode = -1)
+    # Flip the image horizontally for a selfie-view display.
+    image = cv2.flip(image, 1)
     
-#     #Determines the frame size, 640 x 480 offers a nice balance between speed and accurate identification
-#     frame1 = cv2.resize(frame, (320, 240))
-
-# #Below is used to determine location of the joints of the fingers 
-#     a=findpostion(frame1)
-#     b=findnameoflandmark(frame1)
-    
-#     #random_choice = random.randint(0,2)
-#     #status = hand_status(random_choice,pinky_motor,middle_motor,index_motor,thumb_motor)
-    
-
-#     #Below shows the current frame to the desktop 
-#     cv2.imshow("Frame", frame1);
-#     key = cv2.waitKey(1) & 0xFF
-    
-#     #Below states that if the |q| is press on the keyboard it will stop the system
-#     if key == ord("q"):
-#         break
+    if 0 <= clock < 20:
+        success = True
+        text2 = "Ready ?"
+    elif clock < 30:
+        text2 = "3..."
+    elif clock < 50:
+        text2 = "2..."
+    elif clock < 70:
+        text2 = "1..."
+    elif clock == 90:
+        text2 = "GO !"
+        #random_choice = random.randint(0,2)
+        robot =  "paper"
+        #status = hand_status(random_choice,pinky_motor,middle_motor,index_motor,thumb_motor)
+        #reset(pinky_motor,middle_motor,index_motor,thumb_motor)
+        hls = results.multi_hand_landmarks
+        if hls and len(hls) == 1 :
+            humain = getHandMove(hls[0])
+        else:
+            sucess = False
+    elif clock < 150:
+        if success:
+            text = f"Humain Player {humain} vs robot {robot} "
+            if humain == robot:
+                text = f"{text}: Game is tied."
+                text2 = "Nice try again"
+            elif humain == "paper" and robot == "rock":
+                text = f"{text}: Humain wins."
+                text2 = "Yes ! Glory to humain"
+            elif humain == "rock" and robot == "scissors":
+                text = f"{text}: Humain wins."
+                text2 = "Yes ! Glory to humain"
+            elif humain == None or robot == None:
+                text = "No player or didn't play properly"
+                text2 = "Restart!"
+            else:
+                text = f"{text}:  Robot wins"
+                text2 = "Fuck !"
+        else:
+            text = "No player or didn't play properly"
+            text2 = "Restart !"
+    cv2.putText(image,f"{text2}", (10,30),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),1,cv2.LINE_AA)
+    cv2.putText(image,text, (150,60),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),2,cv2.LINE_AA)
+    clock = (clock + 1) % 150
+    text = ""
+    cv2.imshow('MediaPipe Hands', image) 
+    key = cv2.waitKey(1) & 0xFF
+    if key == ord("q"):
+        break
+cap.release()
+cv2.destroyAllWindows()
