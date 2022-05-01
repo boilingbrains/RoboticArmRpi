@@ -44,13 +44,9 @@ def reset(pinky_motor,middle_motor,index_motor,thumb_motor):
     print("Reset")
 def getHandMove(hand_landmarks):
     landmarks = hand_landmarks.landmark 
-    # print(type(landmarks[13].y))
-    # print(type(landmarks[16].y))
-    # print(type(landmarks[17].y))
-    # print(type(landmarks[20].y))
     if all([landmarks[i].y < landmarks[i+3].y for i in range(9,20,4)]):
         return "rock" 
-    elif landmarks[13].y < landmarks[16].y and landmarks[17].y < landmarks[20]:
+    elif landmarks[13].y < landmarks[16].y and landmarks[17].y < landmarks[20].y:
         return "scissors"
     else:
         return "paper"
@@ -65,6 +61,7 @@ thumb_motor = Motor('D')
 index_motor = Motor('C')
 middle_motor = Motor('B') #--> caution: middle move together with ring
 pinky_motor = Motor('A') 
+
 clock = 0
 text = ""
 humain = None
@@ -75,6 +72,9 @@ mp_drawing_styles = mp.solutions.drawing_styles
 mp_hands = mp.solutions.hands
 
 cap = cv2.VideoCapture(0)
+prev_frame_time = 0
+new_frame_time = 0
+
 with mp_hands.Hands(
     model_complexity=0,
     min_detection_confidence=0.5,
@@ -92,6 +92,7 @@ with mp_hands.Hands(
 
     # Draw the hand annotations on the image.
     image.flags.writeable = True
+    image = cv2.resize(image, (640, 480))
     image = cv2.cvtColor(image, cv2.COLOR_RGB2BGR)
     if results.multi_hand_landmarks:
         for hand_landmarks in results.multi_hand_landmarks:
@@ -104,10 +105,13 @@ with mp_hands.Hands(
     
     # Flip the image horizontally for a selfie-view display.
     image = cv2.flip(image, 1)
-    
+    new_frame_time = time.time() 
+    fps = int(1/(new_frame_time-prev_frame_time))
+    prev_frame_time = new_frame_time
     if 0 <= clock < 20:
         success = True
         text2 = "Ready ?"
+        random_choice = random.randint(0,2)
     elif clock < 30:
         text2 = "3..."
     elif clock < 50:
@@ -116,16 +120,14 @@ with mp_hands.Hands(
         text2 = "1..."
     elif clock == 90:
         text2 = "GO !"
-        random_choice = random.randint(0,2)
-        #robot =  "paper"
-        robot = hand_status(random_choice,pinky_motor,middle_motor,index_motor,thumb_motor)
         hls = results.multi_hand_landmarks
-        if hls and len(hls) == 1 :
+        if hls and len(hls) == 1:
             humain = getHandMove(hls[0])
+            robot = hand_status(random_choice,pinky_motor,middle_motor,index_motor,thumb_motor)
         else:
             sucess = False
-    elif clock < 150:
-        if success:
+    elif clock < 120:
+        if success and robot !=0 :
             text = f"Humain Player {humain} vs robot {robot} "
             if humain == robot:
                 text = f"{text}: Game is tied."
@@ -142,14 +144,13 @@ with mp_hands.Hands(
             else:
                 text = f"{text}:  Robot wins"
                 text2 = "Fuck !"
-            reset(pinky_motor,middle_motor,index_motor,thumb_motor)
         else:
             text = "No player or didn't play properly"
             text2 = "Restart !"
-            reset(pinky_motor,middle_motor,index_motor,thumb_motor)
+    cv2.putText(image,f"{fps}", (200,10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),1,cv2.LINE_AA)
     cv2.putText(image,f"{text2}", (10,30),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),1,cv2.LINE_AA)
     cv2.putText(image,text, (150,60),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),2,cv2.LINE_AA)
-    clock = (clock + 1) % 150
+    clock = (clock + 1) % 120
     text = ""
     cv2.imshow('MediaPipe Hands', image) 
     key = cv2.waitKey(1) & 0xFF
