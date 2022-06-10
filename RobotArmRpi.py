@@ -43,7 +43,8 @@ def reset(pinky_motor,middle_motor,index_motor,thumb_motor):
     thumb_motor.run_to_position(0)
     print("Reset")
 def getHandMove(hand_landmarks):
-    landmarks = hand_landmarks.landmark 
+    landmarks = hand_landmarks.landmark
+    #We use < instead of > because y is inverted 
     if all([landmarks[i].y < landmarks[i+3].y for i in range(9,20,4)]):
         return "rock" 
     elif landmarks[13].y < landmarks[16].y and landmarks[17].y < landmarks[20].y:
@@ -108,17 +109,17 @@ with mp_hands.Hands(
     new_frame_time = time.time() 
     fps = int(1/(new_frame_time-prev_frame_time))
     prev_frame_time = new_frame_time
-    if 0 <= clock < 20:
+    if 0 <= clock < 15:
         success = True
         text2 = "Ready ?"
         random_choice = random.randint(0,2)
     elif clock < 30:
         text2 = "3..."
-    elif clock < 50:
+    elif clock < 45:
         text2 = "2..."
-    elif clock < 70:
+    elif clock < 60:
         text2 = "1..."
-    elif clock == 90:
+    elif clock == 60:
         text2 = "GO !"
         hls = results.multi_hand_landmarks
         if hls and len(hls) == 1:
@@ -126,8 +127,8 @@ with mp_hands.Hands(
             robot = hand_status(random_choice,pinky_motor,middle_motor,index_motor,thumb_motor)
         else:
             sucess = False
-    elif clock < 120:
-        if success and robot !=0 :
+    elif clock < 100:
+        if success and robot != None and humain != None:
             text = f"Humain Player {humain} vs robot {robot} "
             if humain == robot:
                 text = f"{text}: Game is tied."
@@ -138,9 +139,6 @@ with mp_hands.Hands(
             elif humain == "rock" and robot == "scissors":
                 text = f"{text}: Humain wins."
                 text2 = "Yes ! Glory to humain"
-            elif humain == None or robot == None:
-                text = "No player or didn't play properly"
-                text2 = "Restart!"
             else:
                 text = f"{text}:  Robot wins"
                 text2 = "Fuck !"
@@ -150,7 +148,7 @@ with mp_hands.Hands(
     cv2.putText(image,f"{fps}", (200,10),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),1,cv2.LINE_AA)
     cv2.putText(image,f"{text2}", (10,30),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),1,cv2.LINE_AA)
     cv2.putText(image,text, (150,60),cv2.FONT_HERSHEY_SIMPLEX,0.5,(255,255,255),2,cv2.LINE_AA)
-    clock = (clock + 1) % 120
+    clock = (clock + 1) % 100
     text = ""
     cv2.imshow('MediaPipe Hands', image) 
     key = cv2.waitKey(1) & 0xFF
